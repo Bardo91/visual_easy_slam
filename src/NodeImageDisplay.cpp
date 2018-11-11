@@ -43,7 +43,8 @@ void NodeImageDisplay::setInData(std::shared_ptr<NodeData> data, int) {
   if (imageData) {
     modelValidationState = NodeValidationState::Valid;
     modelValidationError = QString();
-    cv::Mat cvImage = imageData->image();
+    cv::Mat cvImage;
+    cv::cvtColor(imageData->image(), cvImage, CV_RGB2BGR);
     QPixmap qtImage = QPixmap::fromImage(QImage((unsigned char*) cvImage.data, cvImage.cols, cvImage.rows, QImage::Format_RGB888));
     _label->setPixmap(qtImage);
   }
