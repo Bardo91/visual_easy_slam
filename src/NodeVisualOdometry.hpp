@@ -6,6 +6,9 @@
 
 #include <nodes/NodeDataModel>
 
+#include <rgbd_tools/map3d/Odometry.h>
+#include <rgbd_tools/map3d/OdometryRgbd.h>
+
 #include "ImageData.hpp"
 #include "PoseData.hpp"
 
@@ -26,6 +29,7 @@ class NodeVisualOdometry : public NodeDataModel {
   Q_OBJECT
 
 public:
+  NodeVisualOdometry();
   ~NodeVisualOdometry() {}
 
   QString
@@ -92,4 +96,6 @@ protected:
 
   NodeValidationState modelValidationState = NodeValidationState::Warning;
   QString modelValidationError = QString("Missing or incorrect inputs");
+
+  rgbd::Odometry<pcl::PointXYZRGBNormal, rgbd::DebugLevels::Debug> *mOdometry;
 };

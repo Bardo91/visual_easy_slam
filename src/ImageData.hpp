@@ -12,15 +12,29 @@ using QtNodes::NodeData;
 /// need to be transferred within the Node Editor graph
 class ImageData : public NodeData {
   public:
-    ImageData() {
-      mImage = cv::Mat(480,640, CV_8UC3, cv::Scalar(0,0,0));
+    enum class eImageType {RGB, DEPTH16, DEPTH32};
+    
+    ImageData(){
+
+    }
+
+    ImageData(eImageType _type) {
+      if(_type == eImageType::RGB){
+        mImage = cv::Mat(480,640, CV_8UC3, cv::Scalar(0,0,0));
+      }else if(_type == eImageType::RGB){
+        mImage = cv::Mat(480,640, CV_16UC1, cv::Scalar(0));
+      } else{
+        mImage = cv::Mat(480,640, CV_32FC1, cv::Scalar(0));  
+      }
+      
     }
 
     ImageData(const std::string &_path) {
       mImage = cv::imread(_path);
     }
 
-    ImageData(const cv::Mat &_image) {
+    ImageData(const cv::Mat &_image, eImageType _type) {
+      mType = _type;
       mImage = _image;
     }
 
@@ -32,8 +46,13 @@ class ImageData : public NodeData {
       return mImage; 
     }
 
+    eImageType imageType() const { 
+      return mType; 
+    }
+
   private:
     cv::Mat mImage;
+    eImageType mType;
 
 };
 

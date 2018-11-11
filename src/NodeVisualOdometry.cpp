@@ -1,5 +1,30 @@
 #include "NodeVisualOdometry.hpp"
 
+#include <rgbd_tools/cjson/json.h>
+
+NodeVisualOdometry::NodeVisualOdometry(){
+  mOdometry = new rgbd::OdometryRgbd<pcl::PointXYZRGBNormal, rgbd::DebugLevels::Debug>();
+  
+  cjson::Json mConfigFile;
+  
+  mConfigFile["descriptorDistanceFactor"] = (float) 35.0;
+  mConfigFile["ransacIterations"]  = (int) 1000;
+  mConfigFile["ransacMaxDistance"]  = (float) 0.03;
+  mConfigFile["ransacMinInliers"]  = (int) 20;
+  mConfigFile["ransacRefineIterations"]  = (int) 5;
+  mConfigFile["icpEnabled"]  = (int) 0;
+  mConfigFile["icpMaxCorrespondenceDistance"]  = (float) 0.3;
+  mConfigFile["icpMaxFitnessScore"]  = (float) 5.0;
+  mConfigFile["icpMaxIterations"]  = (int) 3;
+  mConfigFile["icpMaxTransformationEpsilon"]  = (float) 0.00001;
+  mConfigFile["icpVoxelDistance"]  = (float) 0.1;
+  mConfigFile["knearestneighbors"]  = (int) 1;
+
+  if (!mOdometry->init(mConfigFile)) {
+      std::cout << "Error initializing odometry parameters" << std::endl;
+  }
+}
+
 
 unsigned int NodeVisualOdometry::nPorts(PortType portType) const {
   unsigned int result;
@@ -66,8 +91,8 @@ void NodeVisualOdometry::compute() {
   
   cv::drawKeypoints(src, keypointsD, src);
 
-  mDebugImage = std::shared_ptr<ImageData>(new ImageData(src));
+  mDebugImage = std::shared_ptr<ImageData>(new ImageData(src, ImageData::eImageType::RGB));
 
-  emit dataUpdated(1);
   emit dataUpdated(0);
+  emit dataUpdated(1);
 }

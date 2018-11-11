@@ -43,10 +43,20 @@ void NodeImageDisplay::setInData(std::shared_ptr<NodeData> data, int) {
   if (imageData) {
     modelValidationState = NodeValidationState::Valid;
     modelValidationError = QString();
-    cv::Mat cvImage;
-    cv::cvtColor(imageData->image(), cvImage, CV_RGB2BGR);
-    QPixmap qtImage = QPixmap::fromImage(QImage((unsigned char*) cvImage.data, cvImage.cols, cvImage.rows, QImage::Format_RGB888));
-    _label->setPixmap(qtImage);
+    if(imageData->image().rows != 0){
+      if(imageData->imageType() == ImageData::eImageType::RGB){
+        cv::Mat cvImage;
+        cv::cvtColor(imageData->image(), cvImage, CV_RGB2BGR);
+        QPixmap qtImage = QPixmap::fromImage(QImage((unsigned char*) cvImage.data, cvImage.cols, cvImage.rows, QImage::Format_RGB888));
+        _label->setPixmap(qtImage);  
+      }else if(imageData->imageType() == ImageData::eImageType::DEPTH16 || imageData->imageType() == ImageData::eImageType::DEPTH32){ 
+        cv::Mat cvImage;
+        cv::normalize(imageData->image(), cvImage, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+        QPixmap qtImage = QPixmap::fromImage(QImage((unsigned char*) cvImage.data, cvImage.cols, cvImage.rows, QImage::Format_Grayscale8));
+        _label->setPixmap(qtImage);
+      }
+    }
+    
   }
   else {
     modelValidationState = NodeValidationState::Warning;

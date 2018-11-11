@@ -27,7 +27,7 @@ NodeImageStream::NodeImageStream() : _lineEdit(new QLineEdit()) {
       camera >> image;
 
       mImageMutex.lock();
-      mImageData = std::shared_ptr<ImageData>(new ImageData(image));
+      mImageData = std::shared_ptr<ImageData>(new ImageData(image, ImageData::eImageType::RGB));
       mImageMutex.unlock();
 
       emit updatedImage();

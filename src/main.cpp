@@ -12,11 +12,6 @@
 
 #include "NumberSourceDataModel.hpp"
 #include "NumberDisplayDataModel.hpp"
-#include "AdditionModel.hpp"
-#include "SubtractionModel.hpp"
-#include "MultiplicationModel.hpp"
-#include "DivisionModel.hpp"
-#include "ModuloModel.hpp"
 #include "Converters.hpp"
 
 
@@ -24,6 +19,7 @@
 #include "NodeImageDisplay.hpp"
 #include "NodeVisualOdometry.hpp"
 #include "NodeDisplayPoseText.hpp"
+#include "NodeStereoCamera.hpp"
 
 
 using QtNodes::DataModelRegistry;
@@ -39,9 +35,9 @@ registerDataModels()
   auto ret = std::make_shared<DataModelRegistry>();
 
   ret->registerModel<NodeImageStream>("Sources");
+  ret->registerModel<NodeStereoCamera>("Sources");
 
   ret->registerModel<NodeDisplayPoseText>("Displays");
-
   ret->registerModel<NodeImageDisplay>("Displays");
 
   ret->registerModel<NodeVisualOdometry>("Odometry");
