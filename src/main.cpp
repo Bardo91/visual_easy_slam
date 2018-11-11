@@ -22,6 +22,8 @@
 
 #include "NodeImageStream.hpp"
 #include "NodeImageDisplay.hpp"
+#include "NodeVisualOdometry.hpp"
+#include "NodeDisplayPoseText.hpp"
 
 
 using QtNodes::DataModelRegistry;
@@ -35,23 +37,14 @@ static std::shared_ptr<DataModelRegistry>
 registerDataModels()
 {
   auto ret = std::make_shared<DataModelRegistry>();
-  ret->registerModel<NumberSourceDataModel>("Sources");
 
   ret->registerModel<NodeImageStream>("Sources");
 
-  ret->registerModel<NumberDisplayDataModel>("Displays");
+  ret->registerModel<NodeDisplayPoseText>("Displays");
 
   ret->registerModel<NodeImageDisplay>("Displays");
 
-  ret->registerModel<AdditionModel>("Operators");
-
-  ret->registerModel<SubtractionModel>("Operators");
-
-  ret->registerModel<MultiplicationModel>("Operators");
-
-  ret->registerModel<DivisionModel>("Operators");
-
-  ret->registerModel<ModuloModel>("Operators");
+  ret->registerModel<NodeVisualOdometry>("Odometry");
 
   ret->registerTypeConverter(std::make_pair(DecimalData().type(),
                                             IntegerData().type()),

@@ -32,10 +32,6 @@ class ImageData : public NodeData {
       return mImage; 
     }
 
-    QString numberAsText() const{ 
-      return QString("image"); 
-    }
-
   private:
     cv::Mat mImage;
 
