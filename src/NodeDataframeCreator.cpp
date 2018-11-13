@@ -76,8 +76,11 @@ QString NodeDataframeCreator::validationMessage() const {
 
 void NodeDataframeCreator::buildDataframe() {
   mDataframe = std::shared_ptr<DataframeData>(new DataframeData);
-  undistort(mInputImageRgb.lock()->image(), mDataframe->mDataframe->left, mCalibration.lock()->intrinsics(), mCalibration.lock()->distCoefficients());
-
+  cv::Mat intrinsics = mCalibration.lock()->intrinsics();
+  cv::Mat coeffs = mCalibration.lock()->distCoefficients();
+  undistort(mInputImageRgb.lock()->image(), mDataframe->mDataframe->left, intrinsics, coeffs);
+  mDataframe->mDataframe->intrinsic  = intrinsics;
+  mDataframe->mDataframe->coefficients  = coeffs;
 
   // Detect and compute descriptors
   cv::Mat descriptors;
@@ -90,29 +93,57 @@ void NodeDataframeCreator::buildDataframe() {
   pcl::PointCloud<PointType_> cloud;
   _df->cloud = cloud.makeShared();
 */
+  mDataframe->mDataframe->depth = mInputImageDepth.lock()->image();
 
-/*
+  auto colorPixelToPoint = [&](const cv::Point2f &_p2d, cv::Point3f &_point3d){
+    // Retrieve the 16-bit depth value and map it into a depth in meters
+    uint16_t depth_value = mDataframe->mDataframe->depth.at<uint16_t>(_p2d.y, _p2d.x);
+    float depth_in_meters = depth_value * 1;  // 666 depthscale plz
+    // Set invalid pixels with a depth value of zero, which is used to indicate no data
+    if (depth_value == 0) {
+      return false;
+    }
+    else {
+        float x = (_p2d.x - intrinsics.at<double>(0,2)) / intrinsics.at<double>(0,0);
+        float y = (_p2d.y - intrinsics.at<double>(1,2)) / intrinsics.at<double>(1,1);
+
+        _point3d.x = x*depth_in_meters;
+        _point3d.y = y*depth_in_meters;
+        _point3d.z = depth_in_meters;
+      return true;
+    }
+  };
+
   // Create feature cloud.
-  _df->featureCloud = pcl::PointCloud<PointType_>::Ptr(new pcl::PointCloud<PointType_>());
+  mDataframe->mDataframe->featureCloud = pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+  mDataframe->mDataframe->featureCloud->resize(kpts.size());
+  mDataframe->mDataframe->featureProjections.resize(kpts.size());
+  mDataframe->mDataframe->featureDescriptors.resize(kpts.size());
+  int pointCounter = 0;
   for (unsigned k = 0; k < kpts.size(); k++) {
       cv::Point3f point;
-      if (((rgbd::StereoCameraVirtual *)mCamera)->colorPixelToPoint(kpts[k].pt, point)) { // Using coordinates of distorted points to match depth 
+      if (colorPixelToPoint(kpts[k].pt, point)) { // Using coordinates of distorted points to match depth 
           float dist = sqrt(point.x*point.x + point.y*point.y + point.z*point.z);
           if (!std::isnan(point.x) && dist > 0.25 && dist < 6.0) { // 666 min and max dist? 
-              PointType_ pointpcl;
+              pcl::PointXYZRGBNormal pointpcl;
               pointpcl.x = point.x;
               pointpcl.y = point.y;
               pointpcl.z = point.z;
               pointpcl.r = 255;
               pointpcl.g = 0;
               pointpcl.b = 0;
-              _df->featureCloud->push_back(pointpcl);
-              _df->featureDescriptors.push_back(descriptors.row(k)); // 666 TODO: filter a bit?
-              _df->featureProjections.push_back(distortedPoints[k]);    //  Store undistorted points
+              mDataframe->mDataframe->featureCloud->at(pointCounter) = pointpcl;
+              mDataframe->mDataframe->featureDescriptors.row(pointCounter) = descriptors.row(k);
+              mDataframe->mDataframe->featureProjections[pointCounter] = kpts[k].pt;  
+              pointCounter++;
           }
       }
   }
-*/
+  mDataframe->mDataframe->featureCloud->resize(pointCounter+1);
+  mDataframe->mDataframe->featureProjections.resize(pointCounter+1);
+  mDataframe->mDataframe->featureDescriptors.resize(pointCounter+1);
+  
+
   // Filling new dataframe
   mDataframe->mDataframe->orientation = Eigen::Matrix3f::Identity();
   mDataframe->mDataframe->position = Eigen::Vector3f::Zero();

@@ -48,7 +48,7 @@ NodeStereoCamera::NodeStereoCamera() : mPlayButton(new QPushButton("Paused")) {
           mImageMutex.unlock();
 
           emit updatedImage(); 
-
+          mPaused = true;
         }
       }
     }
