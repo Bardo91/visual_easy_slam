@@ -20,6 +20,7 @@
 #include "NodeVisualOdometry.hpp"
 #include "NodeDisplayPoseText.hpp"
 #include "NodeStereoCamera.hpp"
+#include "NodeDataframeCreator.hpp"
 
 
 using QtNodes::DataModelRegistry;
@@ -36,6 +37,8 @@ registerDataModels()
 
   ret->registerModel<NodeImageStream>("Sources");
   ret->registerModel<NodeStereoCamera>("Sources");
+
+  ret->registerModel<NodeDataframeCreator>("Sources");
 
   ret->registerModel<NodeDisplayPoseText>("Displays");
   ret->registerModel<NodeImageDisplay>("Displays");

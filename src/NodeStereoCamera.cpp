@@ -13,7 +13,7 @@ NodeStereoCamera::NodeStereoCamera() : mPlayButton(new QPushButton("Paused")) {
 
   mPlayButton->setMaximumSize(mPlayButton->sizeHint());
 
-  connect(this, &NodeStereoCamera::updatedImage, this, &NodeStereoCamera::onTextEdited);
+  connect(this, &NodeStereoCamera::updatedImage, this, &NodeStereoCamera::onDataUpdated);
   connect(mPlayButton, &QPushButton::clicked, this, &NodeStereoCamera::togglePause);
 
   mImageAcquisitionThread = std::thread([&](){
@@ -42,9 +42,13 @@ NodeStereoCamera::NodeStereoCamera() : mPlayButton(new QPushButton("Paused")) {
           mLeftImageData = std::shared_ptr<ImageData>(new ImageData(left, ImageData::eImageType::RGB));
           mRightImageData = std::shared_ptr<ImageData>(new ImageData(right, ImageData::eImageType::RGB));
           mDepthImageData = std::shared_ptr<ImageData>(new ImageData(depth, ImageData::eImageType::DEPTH16));
+          cv::Mat intrinsics, coeffs;
+          camera->leftCalibration(intrinsics, coeffs);
+          mCalibration = std::shared_ptr<CalibrationData>(new CalibrationData(intrinsics, coeffs));
           mImageMutex.unlock();
 
-          emit updatedImage();
+          emit updatedImage(); 
+
         }
       }
     }
@@ -72,7 +76,7 @@ unsigned int NodeStereoCamera::nPorts(PortType portType) const {
       break;
 
     case PortType::Out:
-      result = 3;
+      result = 4;
 
     default:
       break;
@@ -82,25 +86,30 @@ unsigned int NodeStereoCamera::nPorts(PortType portType) const {
 }
 
 
-void NodeStereoCamera::onTextEdited() {
-    emit dataUpdated(0);
-    emit dataUpdated(1);
-    emit dataUpdated(2);
-}
 
-
-NodeDataType NodeStereoCamera::dataType(PortType, PortIndex) const {
-  return ImageData().type();
+NodeDataType NodeStereoCamera::dataType(PortType, PortIndex _index) const {
+    if(_index == 0){
+      return ImageData().type();
+    }else if (_index == 1) {
+      return ImageData().type();    
+    }if(_index == 2){
+      return ImageData().type();
+    }else if (_index == 3) {
+      return CalibrationData().type();    
+    }
 }
 
 
 std::shared_ptr<NodeData> NodeStereoCamera::outData(PortIndex _index) {
   std::lock_guard<std::mutex> locker(mImageMutex);
+
   if(_index == 0){
     return mLeftImageData;    
   }else  if(_index == 1){
     return mRightImageData;
-  }else{
+  }else if(_index == 2){
     return mDepthImageData;
+  }else if(_index == 3){
+    return mCalibration;
   }
 }

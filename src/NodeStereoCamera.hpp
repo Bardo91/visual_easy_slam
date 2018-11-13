@@ -14,6 +14,7 @@
 #include <thread>
 
 #include "ImageData.hpp"
+#include "CalibrationData.hpp"
 
 class DecimalData;
 
@@ -48,6 +49,26 @@ public:
 
   QString name() const override { return QStringLiteral("StereoCamera"); }
 
+  QString   portCaption(PortType portType, PortIndex portIndex) const override {
+    switch (portType) {
+      case PortType::In:
+        break;
+      case PortType::Out:
+        if (portIndex == 0)
+          return QStringLiteral("left_image");
+        else if (portIndex == 1)
+          return QStringLiteral("right_image");
+        else if (portIndex == 2)
+          return QStringLiteral("depth_image");
+        else if (portIndex == 3)
+          return QStringLiteral("calibration");
+
+      default:
+        break;
+    }
+    return QString();
+  }
+
 public:
 
   QJsonObject save() const override;
@@ -67,7 +88,12 @@ public:
   QWidget * embeddedWidget() override { return mPlayButton; }
 
 private slots:
-  void onTextEdited();
+  void onDataUpdated() { 
+    emit dataUpdated(0); 
+    emit dataUpdated(1); 
+    emit dataUpdated(2); 
+    emit dataUpdated(3); 
+  }
   void togglePause(){
     mPaused = !mPaused;
     if(mPaused){
@@ -84,6 +110,8 @@ private:
   std::shared_ptr<ImageData> mLeftImageData;
   std::shared_ptr<ImageData> mRightImageData;
   std::shared_ptr<ImageData> mDepthImageData;
+  std::shared_ptr<CalibrationData> mCalibration;
+  
 
   std::mutex mImageMutex;
 

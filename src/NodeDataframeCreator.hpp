@@ -10,7 +10,8 @@
 #include <rgbd_tools/map3d/OdometryRgbd.h>
 
 #include "ImageData.hpp"
-#include "PoseData.hpp"
+#include "DataframeData.hpp"
+#include "CalibrationData.hpp"
 
 #include <iostream>
 
@@ -25,12 +26,12 @@ using QtNodes::NodeValidationState;
 
 /// The model dictates the number of inputs and outputs for the Node.
 /// In this example it has no logic.
-class NodeVisualOdometry : public NodeDataModel {
+class NodeDataframeCreator : public NodeDataModel {
   Q_OBJECT
 
 public:
-  NodeVisualOdometry();
-  ~NodeVisualOdometry() {}
+  NodeDataframeCreator();
+  ~NodeDataframeCreator() {}
 
   QString
   caption() const override
@@ -43,18 +44,26 @@ public:
     return true;
   }
 
-  QString   portCaption(PortType portType, PortIndex portIndex) const override {
-    switch (portType) {
+  QString  portCaption(PortType portType, PortIndex portIndex) const override
+  {
+    switch (portType)
+    {
       case PortType::In:
-        return QStringLiteral("Image");
+        if (portIndex == 0)
+          return QStringLiteral("rgb_image");
+        if (portIndex == 1)
+          return QStringLiteral("depth_image");
+        if (portIndex == 2)
+          return QStringLiteral("calibration");
 
+        
         break;
 
       case PortType::Out:
         if (portIndex == 0)
           return QStringLiteral("debug_image");
         else if (portIndex == 1)
-          return QStringLiteral("result_pose");
+          return QStringLiteral("dataframe");
 
       default:
         break;
@@ -62,9 +71,9 @@ public:
     return QString();
   }
 
-  QString  name() const override { 
-    return QStringLiteral("visual_odometry"); 
-  }
+  QString
+  name() const override
+  { return QStringLiteral("dataframe_creator"); }
 
 public:
 
@@ -83,16 +92,19 @@ public:
   QString validationMessage() const override;
 
 protected:
-  void compute();
+  void buildDataframe();
 
 protected:
-  std::weak_ptr<ImageData> mInputImage;
+  std::weak_ptr<ImageData> mInputImageRgb;
+  std::weak_ptr<ImageData> mInputImageDepth;
+  std::weak_ptr<CalibrationData> mCalibration; 
+  cv::Ptr<cv::ORB> mFeatureDetector ;
 
   std::shared_ptr<ImageData> mDebugImage;
-  std::shared_ptr<PoseData> mResultPose; 
+  std::shared_ptr<DataframeData> mDataframe; 
 
   NodeValidationState modelValidationState = NodeValidationState::Warning;
   QString modelValidationError = QString("Missing or incorrect inputs");
 
-  rgbd::Odometry<pcl::PointXYZRGBNormal, rgbd::DebugLevels::Debug> *mOdometry;
+  int mDfCounter = 0;
 };
