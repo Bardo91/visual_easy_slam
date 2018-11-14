@@ -10,17 +10,14 @@
 
 #include <nodes/DataModelRegistry>
 
-#include "NumberSourceDataModel.hpp"
-#include "NumberDisplayDataModel.hpp"
 #include "Converters.hpp"
 
-
-#include "NodeImageStream.hpp"
-#include "NodeImageDisplay.hpp"
-#include "NodeVisualOdometry.hpp"
-#include "NodeDisplayPoseText.hpp"
-#include "NodeStereoCamera.hpp"
-#include "NodeDataframeCreator.hpp"
+#include <nodes/sources/NodeImageStream.hpp>
+#include <nodes/sources/NodeStereoCamera.hpp>
+#include <nodes/operations/NodeVisualOdometry.hpp>
+#include <nodes/operations/NodeDataframeCreator.hpp>
+#include <nodes/outputs/NodeImageDisplay.hpp>
+#include <nodes/outputs/NodeDisplayPoseText.hpp>
 
 
 using QtNodes::DataModelRegistry;

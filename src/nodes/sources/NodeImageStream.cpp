@@ -1,4 +1,10 @@
-#include "NodeImageStream.hpp"
+//
+//
+//
+//
+//
+
+#include <nodes/sources/NodeImageStream.hpp>
 
 #include <QtCore/QJsonValue>
 #include <QtGui/QDoubleValidator>

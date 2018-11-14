@@ -1,9 +1,15 @@
-#include "NumberSourceDataModel.hpp"
+//
+//
+//
+//
+//
+
+#include <nodes/sources/NumberSourceDataModel.hpp>
 
 #include <QtCore/QJsonValue>
 #include <QtGui/QDoubleValidator>
 
-#include "DecimalData.hpp"
+#include <data_types/DecimalData.hpp>
 
 NumberSourceDataModel::
 NumberSourceDataModel()

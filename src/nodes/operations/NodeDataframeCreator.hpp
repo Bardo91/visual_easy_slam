@@ -1,4 +1,11 @@
-#pragma once
+//
+//
+//
+//
+// 
+
+#ifndef NODEDATAFRAMECREATOR_H_
+#define NODEDATAFRAMECREATOR_H_
 
 #include <QtCore/QObject>
 #include <QtCore/QJsonObject>
@@ -9,10 +16,10 @@
 #include <rgbd_tools/map3d/Odometry.h>
 #include <rgbd_tools/map3d/OdometryRgbd.h>
 
-#include "ImageData.hpp"
-#include "DataframeData.hpp"
-#include "CalibrationData.hpp"
-
+#include <data_types/ImageData.hpp>
+#include <data_types/DataframeData.hpp>
+#include <data_types/CalibrationData.hpp>
+#include <mutex>
 #include <iostream>
 
 class DecimalData;
@@ -106,5 +113,10 @@ protected:
   NodeValidationState modelValidationState = NodeValidationState::Warning;
   QString modelValidationError = QString("Missing or incorrect inputs");
 
+  std::mutex mCreationLocker;
+  bool mWorking = false;
+
   int mDfCounter = 0;
 };
+
+#endif

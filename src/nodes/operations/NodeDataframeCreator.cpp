@@ -1,6 +1,13 @@
-#include "NodeDataframeCreator.hpp"
+//
+//
+//
+//
+// 
+
+#include <nodes/operations/NodeDataframeCreator.hpp>
 
 #include <rgbd_tools/cjson/json.h>
+#include <chrono>
 
 NodeDataframeCreator::NodeDataframeCreator(){
     mFeatureDetector = cv::ORB::create(1000);//(2000, 4,31,0,3, cv::ORB::HARRIS_SCORE,31,30);
@@ -50,16 +57,31 @@ std::shared_ptr<NodeData> NodeDataframeCreator::outData(PortIndex portIndex) {
 void NodeDataframeCreator::setInData(std::shared_ptr<NodeData> data, PortIndex portIndex) {
   if(portIndex == 0){
     auto imageData = std::dynamic_pointer_cast<ImageData>(data);
-    mInputImageRgb = imageData;
+
+    if (imageData) 
+      mInputImageRgb = imageData;
   }else if(portIndex == 1){
     auto imageData = std::dynamic_pointer_cast<ImageData>(data);
-    mInputImageDepth = imageData;
+    if (imageData) 
+      mInputImageDepth = imageData;
   }else if(portIndex == 2){
     auto calibrationData = std::dynamic_pointer_cast<CalibrationData>(data);
-    mCalibration = calibrationData;
-    
-    if(mInputImageDepth.lock() != nullptr && mInputImageRgb.lock() != nullptr&& mCalibration.lock() != nullptr){
-      buildDataframe();
+    if (calibrationData){ 
+        mCalibration = calibrationData;
+      
+      if(mInputImageDepth.lock() != nullptr && mInputImageRgb.lock() != nullptr&& mCalibration.lock() != nullptr){
+        mCreationLocker.lock();
+        if(!mWorking){
+          mWorking = true;
+          mCreationLocker.unlock();
+          buildDataframe();
+          mCreationLocker.lock();
+          mWorking = false;
+          mCreationLocker.unlock();      
+        }else{
+          mCreationLocker.unlock();
+        }
+      }
     }
   }
 }
@@ -75,6 +97,7 @@ QString NodeDataframeCreator::validationMessage() const {
 }
 
 void NodeDataframeCreator::buildDataframe() {
+  auto t0 = std::chrono::high_resolution_clock::now();
   mDataframe = std::shared_ptr<DataframeData>(new DataframeData);
   cv::Mat intrinsics = mCalibration.lock()->intrinsics();
   cv::Mat coeffs = mCalibration.lock()->distCoefficients();
@@ -157,8 +180,10 @@ void NodeDataframeCreator::buildDataframe() {
   cv::drawKeypoints(mDataframe->mDataframe->left, kpts, debugImage);
   mDebugImage = std::shared_ptr<ImageData>(new ImageData(debugImage, ImageData::eImageType::RGB));
 
-
-
   emit dataUpdated(0);
   emit dataUpdated(1);
+
+
+  auto t1 = std::chrono::high_resolution_clock::now();
+  std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(t1-t0).count() << std::endl;
 }

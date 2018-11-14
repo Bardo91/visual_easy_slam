@@ -1,6 +1,12 @@
-#include "NodeImageDisplay.hpp"
+//
+//
+//
+//
+//
 
-#include "ImageData.hpp"
+#include <nodes/outputs/NodeImageDisplay.hpp>
+
+#include <data_types/ImageData.hpp>
 
 NodeImageDisplay::NodeImageDisplay(): _label(new QLabel()) {
   _label->setMargin(3);

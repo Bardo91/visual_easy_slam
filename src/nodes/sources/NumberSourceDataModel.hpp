@@ -1,4 +1,12 @@
-#pragma once
+//
+//
+//
+//
+//
+//
+
+#ifndef NUMBERSOURCEDATAMODEL_H_
+#define NUMBERSOURCEDATAMODEL_H_
 
 #include <QtCore/QObject>
 #include <QtWidgets/QLineEdit>
@@ -80,3 +88,5 @@ private:
 
   QLineEdit * _lineEdit;
 };
+
+#endif

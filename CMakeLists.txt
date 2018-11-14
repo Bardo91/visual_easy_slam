@@ -52,6 +52,7 @@ set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_AUTOMOC ON)
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
+target_include_directories(${PROJECT_NAME} PUBLIC ./src)
 
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${DBoW2_INCLUDE_DIR})

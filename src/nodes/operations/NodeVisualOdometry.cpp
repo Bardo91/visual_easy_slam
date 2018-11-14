@@ -1,4 +1,10 @@
-#include "NodeVisualOdometry.hpp"
+//
+//
+//
+//
+//
+
+#include <nodes/operations/NodeVisualOdometry.hpp>
 
 #include <rgbd_tools/cjson/json.h>
 
@@ -32,7 +38,7 @@ unsigned int NodeVisualOdometry::nPorts(PortType portType) const {
   if (portType == PortType::In)
     result = 1;
   else
-    result = 2;
+    result = 1;
 
   return result;
 }
@@ -40,32 +46,27 @@ unsigned int NodeVisualOdometry::nPorts(PortType portType) const {
 
 NodeDataType NodeVisualOdometry::dataType(PortType _type, PortIndex _index) const {
   if (_type == PortType::In){
-    return ImageData().type();
+    return DataframeData().type();
   }
   else{
-    if(_index == 0){
-      return ImageData().type();
-    }else if (_index == 1) {
-      return PoseData().type();    
-    }
+    return PoseData().type();    
+    
   }
 }
 
 
 std::shared_ptr<NodeData> NodeVisualOdometry::outData(PortIndex portIndex) {
-  if(portIndex == 0)
-    return std::static_pointer_cast<NodeData>(mDebugImage);
-  if(portIndex == 1)
-    return std::static_pointer_cast<NodeData>(mResultPose);
+  return std::static_pointer_cast<NodeData>(mResultPose);
 }
 
 
 void NodeVisualOdometry::setInData(std::shared_ptr<NodeData> data, PortIndex portIndex) {
-  auto imageData = std::dynamic_pointer_cast<ImageData>(data);
+  auto dataframe = std::dynamic_pointer_cast<DataframeData>(data);
 
-  mInputImage = imageData;
-
-  compute();
+  if(dataframe){
+    mDataframe = dataframe;
+    compute();
+  }
 }
 
 
@@ -79,20 +80,13 @@ QString NodeVisualOdometry::validationMessage() const {
 }
 
 void NodeVisualOdometry::compute() {
-  cv::Mat src = mInputImage.lock()->image().clone();
-
-  Eigen::Matrix4f randomPose = Eigen::Matrix4f::Random();
-  mResultPose = std::shared_ptr<PoseData>(new PoseData(randomPose));
-
-  std::vector<cv::KeyPoint> keypointsD;
-  
-  cv::Ptr<cv::FastFeatureDetector> detector= cv::FastFeatureDetector::create();
-  detector->detect(src, keypointsD, cv::Mat());
-  
-  cv::drawKeypoints(src, keypointsD, src);
-
-  mDebugImage = std::shared_ptr<ImageData>(new ImageData(src, ImageData::eImageType::RGB));
-
-  emit dataUpdated(0);
-  emit dataUpdated(1);
+  auto df = mDataframe.lock()->mDataframe;
+  if(mLastCluster == nullptr){
+    mLastCluster = std::shared_ptr<rgbd::ClusterFrames<pcl::PointXYZRGBNormal>>(new rgbd::ClusterFrames<pcl::PointXYZRGBNormal>(df, df->id));
+  }else{
+    if (mOdometry->computeOdometry(mLastCluster, df)) {
+      mResultPose = std::shared_ptr<PoseData>(new PoseData(df->pose));
+      emit dataUpdated(0);
+    }
+  }
 }

@@ -4,6 +4,8 @@
 
 #include <nodes/NodeDataModel>
 #include <opencv2/opencv.hpp>
+#include <mutex>
+#include <thread>
 
 using QtNodes::NodeDataType;
 using QtNodes::NodeData;
@@ -30,6 +32,7 @@ class ImageData : public NodeData {
     }
 
     ImageData(const std::string &_path) {
+      std::lock_guard<std::mutex> locker(mSafeImage);
       mImage = cv::imread(_path);
     }
 
@@ -42,8 +45,9 @@ class ImageData : public NodeData {
       return NodeDataType {"image", "Image"};
     }
 
-    cv::Mat image() const { 
-      return mImage; 
+    cv::Mat image() { 
+      std::lock_guard<std::mutex> locker(mSafeImage);
+      return mImage.clone(); 
     }
 
     eImageType imageType() const { 
@@ -53,6 +57,7 @@ class ImageData : public NodeData {
   private:
     cv::Mat mImage;
     eImageType mType;
+    std::mutex mSafeImage;
 
 };
 

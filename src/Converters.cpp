@@ -2,8 +2,8 @@
 
 #include <QtGui/QDoubleValidator>
 
-#include "DecimalData.hpp"
-#include "IntegerData.hpp"
+#include <data_types/DecimalData.hpp>
+#include <data_types/IntegerData.hpp>
 
 
 

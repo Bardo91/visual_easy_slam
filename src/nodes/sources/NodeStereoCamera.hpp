@@ -13,8 +13,8 @@
 #include <mutex>
 #include <thread>
 
-#include "ImageData.hpp"
-#include "CalibrationData.hpp"
+#include <data_types/ImageData.hpp>
+#include <data_types/CalibrationData.hpp>
 
 class DecimalData;
 

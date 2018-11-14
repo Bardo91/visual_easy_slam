@@ -1,11 +1,18 @@
-#pragma once
+//
+//
+//
+//
+//
+
+#ifndef NODEIMAGESTREAM_H_
+#define NODEIMAGESTREAM_H_
 
 #include <QtCore/QObject>
 #include <QtWidgets/QLineEdit>
 
 #include <nodes/NodeDataModel>
 
-#include "ImageData.hpp"
+#include <data_types/ImageData.hpp>
 #include <opencv2/opencv.hpp>
 
 #include <iostream>
@@ -78,3 +85,5 @@ private:
 
   QLineEdit * _lineEdit;
 };
+
+#endif

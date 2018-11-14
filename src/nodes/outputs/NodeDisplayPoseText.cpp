@@ -1,16 +1,20 @@
-#include "NodeDisplayPoseText.hpp"
+//
+//
+//
+//
+//
 
-#include "DecimalData.hpp"
+#include <nodes/outputs/NodeDisplayPoseText.hpp>
 
-NodeDisplayPoseText::
-NodeDisplayPoseText() : _label(new QLabel()) {
+#include <data_types/DecimalData.hpp>
+
+NodeDisplayPoseText::NodeDisplayPoseText() : _label(new QLabel()) {
   _label->setMargin(3);
 }
 
 
 unsigned int NodeDisplayPoseText::nPorts(PortType portType) const {
   unsigned int result;
-
   switch (portType) {
     case PortType::In:
       result = 1;

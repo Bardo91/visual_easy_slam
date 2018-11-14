@@ -1,4 +1,11 @@
-#pragma once
+//
+//
+//
+//
+//
+
+#ifndef NUMBERDISPLAYDATAMODEL_H_
+#define NUMBERDISPLAYDATAMODEL_H_
 
 #include <QtCore/QObject>
 #include <QtWidgets/QLabel>
@@ -71,3 +78,6 @@ private:
 
   QLabel * _label;
 };
+
+
+#endif

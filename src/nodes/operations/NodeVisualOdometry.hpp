@@ -1,4 +1,11 @@
-#pragma once
+//
+//
+//
+//
+//
+
+#ifndef NODEVISUALODOMETRY_H_
+#define NODEVISUALODOMETRY_H_
 
 #include <QtCore/QObject>
 #include <QtCore/QJsonObject>
@@ -9,8 +16,8 @@
 #include <rgbd_tools/map3d/Odometry.h>
 #include <rgbd_tools/map3d/OdometryRgbd.h>
 
-#include "ImageData.hpp"
-#include "PoseData.hpp"
+#include <data_types/DataframeData.hpp>
+#include <data_types/PoseData.hpp>
 
 #include <iostream>
 
@@ -37,8 +44,7 @@ public:
   { return QStringLiteral("VisualOdometry"); }
 
   bool
-  portCaptionVisible(PortType portType, PortIndex portIndex) const override
-  {
+  portCaptionVisible(PortType portType, PortIndex portIndex) const override {
     Q_UNUSED(portType); Q_UNUSED(portIndex);
     return true;
   }
@@ -46,16 +52,12 @@ public:
   QString   portCaption(PortType portType, PortIndex portIndex) const override {
     switch (portType) {
       case PortType::In:
-        return QStringLiteral("Image");
-
+        return QStringLiteral("dataframe");
         break;
 
       case PortType::Out:
-        if (portIndex == 0)
-          return QStringLiteral("debug_image");
-        else if (portIndex == 1)
-          return QStringLiteral("result_pose");
-
+        return QStringLiteral("result_pose");
+        break;
       default:
         break;
     }
@@ -86,13 +88,16 @@ protected:
   void compute();
 
 protected:
-  std::weak_ptr<ImageData> mInputImage;
+  std::weak_ptr<DataframeData> mDataframe;
 
-  std::shared_ptr<ImageData> mDebugImage;
   std::shared_ptr<PoseData> mResultPose; 
+
+  std::shared_ptr<rgbd::ClusterFrames<pcl::PointXYZRGBNormal>> mLastCluster = nullptr;
 
   NodeValidationState modelValidationState = NodeValidationState::Warning;
   QString modelValidationError = QString("Missing or incorrect inputs");
 
   rgbd::Odometry<pcl::PointXYZRGBNormal, rgbd::DebugLevels::Debug> *mOdometry;
 };
+
+#endif

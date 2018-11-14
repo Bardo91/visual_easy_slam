@@ -1,4 +1,10 @@
-#include "NodeStereoCamera.hpp"
+//
+//
+//
+//
+//
+
+#include <nodes/sources/NodeStereoCamera.hpp>
 
 #include <QtCore/QJsonValue>
 #include <QtGui/QDoubleValidator>

@@ -1,23 +1,23 @@
-#include "NumberDisplayDataModel.hpp"
+//
+//
+//
+//
+//
 
-#include "DecimalData.hpp"
 
-NumberDisplayDataModel::
-NumberDisplayDataModel()
-  : _label(new QLabel())
-{
+#include <nodes/outputs/NumberDisplayDataModel.hpp>
+
+#include <data_types/DecimalData.hpp>
+
+NumberDisplayDataModel::NumberDisplayDataModel() : _label(new QLabel()) {
   _label->setMargin(3);
 }
 
 
-unsigned int
-NumberDisplayDataModel::
-nPorts(PortType portType) const
-{
+unsigned int NumberDisplayDataModel::nPorts(PortType portType) const {
   unsigned int result = 1;
 
-  switch (portType)
-  {
+  switch (portType) {
     case PortType::In:
       result = 1;
       break;
@@ -33,31 +33,21 @@ nPorts(PortType portType) const
 }
 
 
-NodeDataType
-NumberDisplayDataModel::
-dataType(PortType, PortIndex) const
-{
+NodeDataType NumberDisplayDataModel::dataType(PortType, PortIndex) const {
   return DecimalData().type();
 }
 
 
-std::shared_ptr<NodeData>
-NumberDisplayDataModel::
-outData(PortIndex)
-{
+std::shared_ptr<NodeData> NumberDisplayDataModel::outData(PortIndex) {
   std::shared_ptr<NodeData> ptr;
   return ptr;
 }
 
 
-void
-NumberDisplayDataModel::
-setInData(std::shared_ptr<NodeData> data, int)
-{
+void NumberDisplayDataModel::setInData(std::shared_ptr<NodeData> data, int) {
   auto numberData = std::dynamic_pointer_cast<DecimalData>(data);
 
-  if (numberData)
-  {
+  if (numberData) {
     modelValidationState = NodeValidationState::Valid;
     modelValidationError = QString();
     _label->setText(numberData->numberAsText());
