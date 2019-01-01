@@ -31,6 +31,33 @@ NodeVisualOdometry::NodeVisualOdometry(){
   }
 }
 
+QString NodeVisualOdometry::caption() const  { 
+  return QStringLiteral("RGBDOdometry"); 
+}
+
+bool NodeVisualOdometry::portCaptionVisible(PortType portType, PortIndex portIndex) const  {
+  Q_UNUSED(portType); Q_UNUSED(portIndex);
+  return true;
+}
+
+QString NodeVisualOdometry::portCaption(PortType portType, PortIndex portIndex) const  {
+  switch (portType) {
+    case PortType::In:
+      return QStringLiteral("dataframe");
+      break;
+
+    case PortType::Out:
+      return QStringLiteral("result_pose");
+      break;
+    default:
+      break;
+  }
+  return QString();
+}
+
+QString NodeVisualOdometry::name() const  { 
+  return QStringLiteral("RGBD Odometry"); 
+}
 
 unsigned int NodeVisualOdometry::nPorts(PortType portType) const {
   unsigned int result;

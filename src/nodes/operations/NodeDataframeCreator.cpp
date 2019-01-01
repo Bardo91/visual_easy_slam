@@ -110,18 +110,7 @@ void NodeDataframeCreator::setInData(std::shared_ptr<NodeData> data, PortIndex p
       mCalibration = calibrationData;
 
       if (mInputImageDepth.lock() != nullptr && mInputImageRgb.lock() != nullptr && mCalibration.lock() != nullptr) {
-        mCreationLocker.lock();
-        if (!mWorking) {
-          mWorking = true;
-          mCreationLocker.unlock();
-          buildDataframe();
-          mCreationLocker.lock();
-          mWorking = false;
-          mCreationLocker.unlock();
-        }
-        else {
-          mCreationLocker.unlock();
-        }
+        buildDataframe();
       }
     }
   }
@@ -153,10 +142,7 @@ void NodeDataframeCreator::buildDataframe() {
   cv::Mat leftGrayUndistort;
   cv::cvtColor(mDataframe->mDataframe->left, leftGrayUndistort, CV_BGR2GRAY);
   mFeatureDetector->detectAndCompute(leftGrayUndistort, cv::Mat(), kpts, descriptors);
-/*
-  pcl::PointCloud<PointType_> cloud;
-  _df->cloud = cloud.makeShared();
-*/
+
   mDataframe->mDataframe->depth = mInputImageDepth.lock()->image();
 
   auto colorPixelToPoint = [&](const cv::Point2f &_p2d, cv::Point3f &_point3d){
@@ -207,14 +193,11 @@ void NodeDataframeCreator::buildDataframe() {
   mDataframe->mDataframe->featureProjections.resize(pointCounter+1);
   mDataframe->mDataframe->featureDescriptors.resize(pointCounter+1);
   
-
   // Filling new dataframe
   mDataframe->mDataframe->orientation = Eigen::Matrix3f::Identity();
   mDataframe->mDataframe->position = Eigen::Vector3f::Zero();
   mDataframe->mDataframe->id = mDfCounter;
   mDfCounter++;   // TODO: Database info?
-
-
 
   //////////////
   cv::Mat debugImage;
@@ -224,7 +207,5 @@ void NodeDataframeCreator::buildDataframe() {
   emit dataUpdated(0);
   emit dataUpdated(1);
 
-
   auto t1 = std::chrono::high_resolution_clock::now();
-  std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(t1-t0).count() << std::endl;
 }

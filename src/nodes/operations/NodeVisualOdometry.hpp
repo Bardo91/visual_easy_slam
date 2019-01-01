@@ -36,51 +36,23 @@ class NodeVisualOdometry : public NodeDataModel {
   Q_OBJECT
 
 public:
+  //-------------- CONSTRUCTORS --------------
   NodeVisualOdometry();
   ~NodeVisualOdometry() {}
 
-  QString caption() const override { 
-    return QStringLiteral("RGBDOdometry"); 
-  }
+  //-------------- DISPLAY INFO --------------
+  QString caption() const override;
+  bool portCaptionVisible(PortType portType, PortIndex portIndex) const override;
+  QString   portCaption(PortType portType, PortIndex portIndex) const override;
+  QString  name() const override;
 
-  bool portCaptionVisible(PortType portType, PortIndex portIndex) const override {
-    Q_UNUSED(portType); Q_UNUSED(portIndex);
-    return true;
-  }
-
-  QString   portCaption(PortType portType, PortIndex portIndex) const override {
-    switch (portType) {
-      case PortType::In:
-        return QStringLiteral("dataframe");
-        break;
-
-      case PortType::Out:
-        return QStringLiteral("result_pose");
-        break;
-      default:
-        break;
-    }
-    return QString();
-  }
-
-  QString  name() const override { 
-    return QStringLiteral("RGBD Odometry"); 
-  }
-
-public:
-
+  //-------------- DATA FLOW --------------
   unsigned int nPorts(PortType portType) const override;
-
   NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
-
   std::shared_ptr<NodeData> outData(PortIndex port) override;
-
   void setInData(std::shared_ptr<NodeData> data, PortIndex portIndex) override;
-
   QWidget * embeddedWidget() override { return nullptr; }
-
   NodeValidationState validationState() const override;
-
   QString validationMessage() const override;
 
 protected:
