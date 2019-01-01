@@ -127,14 +127,19 @@ QString NodeDataframeCreator::validationMessage() const {
 }
 
 void NodeDataframeCreator::buildDataframe() {
-  auto t0 = std::chrono::high_resolution_clock::now();
+  // Create dataframe
   mDataframe = std::shared_ptr<DataframeData>(new DataframeData);
+  
+  // Set basic raw data
   cv::Mat intrinsics = mCalibration.lock()->intrinsics();
   cv::Mat coeffs = mCalibration.lock()->distCoefficients();
   undistort(mInputImageRgb.lock()->image(), mDataframe->mDataframe->left, intrinsics, coeffs);
   mDataframe->mDataframe->intrinsic  = intrinsics;
   mDataframe->mDataframe->coefficients  = coeffs;
-
+  mDataframe->mDataframe->depth = mInputImageDepth.lock()->image();
+  mDataframe->mDataframe->id = mDfCounter;
+  mDfCounter++;
+  
   // Detect and compute descriptors
   cv::Mat descriptors;
   std::vector<cv::KeyPoint> kpts;
@@ -142,8 +147,6 @@ void NodeDataframeCreator::buildDataframe() {
   cv::Mat leftGrayUndistort;
   cv::cvtColor(mDataframe->mDataframe->left, leftGrayUndistort, CV_BGR2GRAY);
   mFeatureDetector->detectAndCompute(leftGrayUndistort, cv::Mat(), kpts, descriptors);
-
-  mDataframe->mDataframe->depth = mInputImageDepth.lock()->image();
 
   auto colorPixelToPoint = [&](const cv::Point2f &_p2d, cv::Point3f &_point3d){
     // Retrieve the 16-bit depth value and map it into a depth in meters
@@ -166,15 +169,12 @@ void NodeDataframeCreator::buildDataframe() {
 
   // Create feature cloud.
   mDataframe->mDataframe->featureCloud = pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
-  mDataframe->mDataframe->featureCloud->resize(kpts.size());
-  mDataframe->mDataframe->featureProjections.resize(kpts.size());
-  mDataframe->mDataframe->featureDescriptors.resize(kpts.size());
   int pointCounter = 0;
   for (unsigned k = 0; k < kpts.size(); k++) {
       cv::Point3f point;
       if (colorPixelToPoint(kpts[k].pt, point)) { // Using coordinates of distorted points to match depth 
           float dist = sqrt(point.x*point.x + point.y*point.y + point.z*point.z);
-          if (!std::isnan(point.x) && dist > 0.25 && dist < 6.0) { // 666 min and max dist? 
+          if (!std::isnan(point.x)) { // 666 min and max dist? 
               pcl::PointXYZRGBNormal pointpcl;
               pointpcl.x = point.x;
               pointpcl.y = point.y;
@@ -182,30 +182,17 @@ void NodeDataframeCreator::buildDataframe() {
               pointpcl.r = 255;
               pointpcl.g = 0;
               pointpcl.b = 0;
-              mDataframe->mDataframe->featureCloud->at(pointCounter) = pointpcl;
-              mDataframe->mDataframe->featureDescriptors.row(pointCounter) = descriptors.row(k);
-              mDataframe->mDataframe->featureProjections[pointCounter] = kpts[k].pt;  
-              pointCounter++;
+              mDataframe->mDataframe->featureCloud->push_back(pointpcl);
+              mDataframe->mDataframe->featureDescriptors.push_back(descriptors.row(k));
+              mDataframe->mDataframe->featureProjections.push_back(kpts[k].pt);
           }
       }
   }
-  mDataframe->mDataframe->featureCloud->resize(pointCounter+1);
-  mDataframe->mDataframe->featureProjections.resize(pointCounter+1);
-  mDataframe->mDataframe->featureDescriptors.resize(pointCounter+1);
-  
-  // Filling new dataframe
-  mDataframe->mDataframe->orientation = Eigen::Matrix3f::Identity();
-  mDataframe->mDataframe->position = Eigen::Vector3f::Zero();
-  mDataframe->mDataframe->id = mDfCounter;
-  mDfCounter++;   // TODO: Database info?
 
-  //////////////
   cv::Mat debugImage;
   cv::drawKeypoints(mDataframe->mDataframe->left, kpts, debugImage);
   mDebugImage = std::shared_ptr<ImageData>(new ImageData(debugImage, ImageData::eImageType::RGB));
 
   emit dataUpdated(0);
   emit dataUpdated(1);
-
-  auto t1 = std::chrono::high_resolution_clock::now();
 }
