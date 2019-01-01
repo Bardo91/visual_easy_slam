@@ -39,12 +39,11 @@ public:
   NodeVisualOdometry();
   ~NodeVisualOdometry() {}
 
-  QString
-  caption() const override
-  { return QStringLiteral("RGBDOdometry"); }
+  QString caption() const override { 
+    return QStringLiteral("RGBDOdometry"); 
+  }
 
-  bool
-  portCaptionVisible(PortType portType, PortIndex portIndex) const override {
+  bool portCaptionVisible(PortType portType, PortIndex portIndex) const override {
     Q_UNUSED(portType); Q_UNUSED(portIndex);
     return true;
   }

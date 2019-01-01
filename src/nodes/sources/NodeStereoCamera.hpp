@@ -16,6 +16,9 @@
 #include <data_types/ImageData.hpp>
 #include <data_types/CalibrationData.hpp>
 
+#include <rgbd_tools/cjson/json.h>
+
+
 class DecimalData;
 
 using QtNodes::PortType;
@@ -53,7 +56,7 @@ public:
     switch (portType) {
       case PortType::In:
         if (portIndex == 0)
-            return QStringLiteral("Calibration File");
+            return QStringLiteral("calibration_file");
         else
           break;
       case PortType::Out:
@@ -86,7 +89,7 @@ public:
 
   std::shared_ptr<NodeData>  outData(PortIndex port) override;
 
-  void setInData(std::shared_ptr<NodeData>, int) override { }
+  void setInData(std::shared_ptr<NodeData>, int) override;
 
   QWidget * embeddedWidget() override { return mPlayButton; }
 
@@ -110,6 +113,9 @@ signals:
   void updatedImage();
 
 private:
+  void imageAcquisitionThread();
+
+private:
   std::shared_ptr<ImageData> mLeftImageData;
   std::shared_ptr<ImageData> mRightImageData;
   std::shared_ptr<ImageData> mDepthImageData;
@@ -123,6 +129,8 @@ private:
   bool mPaused = true;
 
   QPushButton *mPlayButton;
+  cjson::Json mConfigFile;
+
 };
 
 #endif

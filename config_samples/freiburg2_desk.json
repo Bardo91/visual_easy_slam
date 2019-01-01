@@ -1,0 +1,16 @@
+{
+	"type":"virtual",
+	"config":
+		{
+			"input":
+				{
+				"left":"/home/bardo91/programming/A-DATASETS/freiburg/rgbd_dataset_freiburg2_desk/rgb/left_%d.png",
+				"right":"",
+				"depth":"/home/bardo91/programming/A-DATASETS/freiburg/rgbd_dataset_freiburg2_desk/depth/depth_%d.png",
+				"pointCloud":"",
+				"ointCloud":"/home/bardo91/programming/A-DATASETS/living_room_1/colorCloud_%d.pcd"
+				},
+			"calibFile":"/home/bardo91/programming/A-DATASETS/rgbd_dataset_freiburg3_long_office_household/CalibrationFile.xml",
+			"stepIdx":1
+		}
+}

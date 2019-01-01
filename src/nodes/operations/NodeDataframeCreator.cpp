@@ -55,30 +55,33 @@ std::shared_ptr<NodeData> NodeDataframeCreator::outData(PortIndex portIndex) {
 
 
 void NodeDataframeCreator::setInData(std::shared_ptr<NodeData> data, PortIndex portIndex) {
-  if(portIndex == 0){
+  if (portIndex == 0) {
     auto imageData = std::dynamic_pointer_cast<ImageData>(data);
 
-    if (imageData) 
+    if (imageData)
       mInputImageRgb = imageData;
-  }else if(portIndex == 1){
+  }
+  else if (portIndex == 1) {
     auto imageData = std::dynamic_pointer_cast<ImageData>(data);
-    if (imageData) 
+    if (imageData)
       mInputImageDepth = imageData;
-  }else if(portIndex == 2){
+  }
+  else if (portIndex == 2) {
     auto calibrationData = std::dynamic_pointer_cast<CalibrationData>(data);
-    if (calibrationData){ 
-        mCalibration = calibrationData;
-      
-      if(mInputImageDepth.lock() != nullptr && mInputImageRgb.lock() != nullptr&& mCalibration.lock() != nullptr){
+    if (calibrationData){
+      mCalibration = calibrationData;
+
+      if (mInputImageDepth.lock() != nullptr && mInputImageRgb.lock() != nullptr && mCalibration.lock() != nullptr) {
         mCreationLocker.lock();
-        if(!mWorking){
+        if (!mWorking) {
           mWorking = true;
           mCreationLocker.unlock();
           buildDataframe();
           mCreationLocker.lock();
           mWorking = false;
-          mCreationLocker.unlock();      
-        }else{
+          mCreationLocker.unlock();
+        }
+        else {
           mCreationLocker.unlock();
         }
       }
