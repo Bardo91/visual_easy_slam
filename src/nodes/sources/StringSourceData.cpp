@@ -11,10 +11,10 @@
 
 #include <data_types/StringData.hpp>
 
-StringSourceData::StringSourceData(): _lineEdit(new QLineEdit()) {
-  _lineEdit->setMaximumSize(_lineEdit->sizeHint());
-  connect(_lineEdit, &QLineEdit::textChanged, this, &StringSourceData::onTextEdited);
-  _lineEdit->setText("");
+StringSourceData::StringSourceData(): mTextHolder(new QLineEdit()) {
+  mTextHolder->setMaximumSize(mTextHolder->sizeHint());
+  connect(mTextHolder, &QLineEdit::textChanged, this, &StringSourceData::onTextEdited);
+  mTextHolder->setText("string");
 }
 
 
@@ -33,7 +33,7 @@ void StringSourceData::restore(QJsonObject const &p) {
 
   if (!v.isUndefined()) {
     QString str = v.toString();
-    _lineEdit->setText(str);
+    mTextHolder->setText(str);
   }
 }
 
@@ -57,10 +57,8 @@ unsigned int StringSourceData::nPorts(PortType portType) const {
 }
 
 
-void StringSourceData::onTextEdited(QString const &string){
-  Q_UNUSED(string);
-
-  mStringData = std::make_shared<StringData>(string.toStdString());
+void StringSourceData::onTextEdited(QString const &_string){
+  mStringData = std::make_shared<StringData>(_string);
   emit dataUpdated(0);
 }
 

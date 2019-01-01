@@ -62,7 +62,7 @@ public:
   void setInData(std::shared_ptr<NodeData>, int) override { }
 
   QWidget *embeddedWidget() override { 
-    return _lineEdit; 
+    return mTextHolder; 
   }
 
 private slots:
@@ -71,7 +71,7 @@ private slots:
 private:
   std::shared_ptr<StringData> mStringData;
 
-  QLineEdit * _lineEdit;
+  QLineEdit * mTextHolder;
 };
 
 #endif

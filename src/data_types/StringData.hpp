@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VISUALEASYSLAM_DATATYPES_STRINGDATA_H_
+#define VISUALEASYSLAM_DATATYPES_STRINGDATA_H_
 
 #include <nodes/NodeDataModel>
 
@@ -7,15 +8,17 @@ using QtNodes::NodeData;
 
 /// The class can potentially incapsulate any user data which
 /// need to be transferred within the Node Editor graph
-class StringData : public NodeData
-{
+class StringData : public NodeData {
 public:
-
-  StringData(): mString(""){
+  StringData(){
 
   }
 
-  StringData(std::string const _string): mString(mString){
+  StringData(const std::string _string): mString(_string){
+
+  }
+
+  StringData(const QString _string): mString(_string.toStdString()){
 
   }
 
@@ -29,6 +32,7 @@ public:
   }
 
 private:
-
-  std::string mString;
+  std::string mString = "";
 };
+
+#endif

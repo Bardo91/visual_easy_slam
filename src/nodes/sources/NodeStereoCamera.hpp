@@ -120,6 +120,9 @@ private:
   std::shared_ptr<ImageData> mRightImageData;
   std::shared_ptr<ImageData> mDepthImageData;
   std::shared_ptr<CalibrationData> mCalibration;
+
+  NodeValidationState modelValidationState = NodeValidationState::Warning;
+  QString modelValidationError = QStringLiteral("Missing or incorrect inputs");
   
 
   std::mutex mImageMutex;

@@ -28,7 +28,8 @@ NodeStereoCamera::NodeStereoCamera() : mPlayButton(new QPushButton("Paused")) {
 void NodeStereoCamera::imageAcquisitionThread(){
   rgbd::StereoCamera *camera = rgbd::StereoCamera::create(mConfigFile["type"]);
 
-  if(camera->init(mConfigFile["config"])){
+  if(camera && camera->init(mConfigFile["config"])){
+    mRunning = true;
     while(mRunning){
       if(mPaused){
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -51,6 +52,9 @@ void NodeStereoCamera::imageAcquisitionThread(){
         mPaused = true;
       }
     }
+  }else{
+    modelValidationState = NodeValidationState::Warning;
+    modelValidationError = QStringLiteral("Failed camera initialization");
   }
 }
 
@@ -69,23 +73,31 @@ void NodeStereoCamera::setInData(std::shared_ptr<NodeData> _data, int _portIndex
     auto stringData = std::dynamic_pointer_cast<StringData>(_data);
 
     if (stringData){
-      std::ifstream file(stringData->string().toStdString());
+      std::string configFilePath = stringData->string().toStdString();
+      std::ifstream file(configFilePath);
       if (!file.is_open()) {
-          std::cout << "Cannot open file." << std::endl;
+          modelValidationState = NodeValidationState::Warning;
+          modelValidationError = QStringLiteral("Config file not found");
           return;
       }
-      if (!mConfigFile.parse(file)) {
-          std::cout << "Cannot parse config file." << std::endl;
+      if (!mConfigFile.parse(file)) {    
+          modelValidationState = NodeValidationState::Warning;
+          modelValidationError = QStringLiteral("Failed parse of config file");
           return;
       }
       mRunning = false;
       if(mImageAcquisitionThread.joinable())
         mImageAcquisitionThread.join();
 
+      modelValidationState = NodeValidationState::Valid;
+      modelValidationError = QString();
       mImageAcquisitionThread = std::thread(&NodeStereoCamera::imageAcquisitionThread, this);
+    }else{
+
     }
   }
 }
+
 
 unsigned int NodeStereoCamera::nPorts(PortType portType) const {
   unsigned int result = 1;
