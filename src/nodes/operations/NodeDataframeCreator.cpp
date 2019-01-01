@@ -14,6 +14,44 @@ NodeDataframeCreator::NodeDataframeCreator(){
 }
 
 
+QString NodeDataframeCreator::caption() const { 
+  return QStringLiteral("Dataframe Creator"); 
+}
+
+bool NodeDataframeCreator::portCaptionVisible(PortType portType, PortIndex portIndex) const {
+  Q_UNUSED(portType); Q_UNUSED(portIndex);
+  return true;
+}
+
+QString  NodeDataframeCreator::portCaption(PortType portType, PortIndex portIndex) const  {
+  switch (portType) {
+    case PortType::In:
+      if (portIndex == 0)
+        return QStringLiteral("rgb_image");
+      if (portIndex == 1)
+        return QStringLiteral("depth_image");
+      if (portIndex == 2)
+        return QStringLiteral("calibration");
+
+      
+      break;
+
+    case PortType::Out:
+      if (portIndex == 0)
+        return QStringLiteral("debug_image");
+      else if (portIndex == 1)
+        return QStringLiteral("dataframe");
+
+    default:
+      break;
+  }
+  return QString();
+}
+
+QString  NodeDataframeCreator::name() const  { 
+  return QStringLiteral("Dataframe Creator"); 
+}
+
 unsigned int NodeDataframeCreator::nPorts(PortType portType) const {
   unsigned int result;
 
