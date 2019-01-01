@@ -142,44 +142,42 @@ void NodeDataframeCreator::buildDataframe() {
   cv::cvtColor(mDataframe->mDataframe->left, leftGrayUndistort, CV_BGR2GRAY);
   mFeatureDetector->detectAndCompute(leftGrayUndistort, cv::Mat(), kpts, descriptors);
 
-  auto colorPixelToPoint = [&](const cv::Point2f &_p2d, cv::Point3f &_point3d){
-    // Retrieve the 16-bit depth value and map it into a depth in meters
-    uint16_t depth_value = mDataframe->mDataframe->depth.at<uint16_t>(_p2d.y, _p2d.x);
-    float depth_in_meters = depth_value * 0.001;  // 666 depthscale plz
-    // Set invalid pixels with a depth value of zero, which is used to indicate no data
-    if (depth_value == 0) {
-      return false;
-    }
-    else {
-        float x = (_p2d.x - intrinsics.at<float>(0,2)) / intrinsics.at<float>(0,0);
-        float y = (_p2d.y - intrinsics.at<float>(1,2)) / intrinsics.at<float>(1,1);
-
-        _point3d.x = x*depth_in_meters;
-        _point3d.y = y*depth_in_meters;
-        _point3d.z = depth_in_meters;
-      return true;
-    }
-  };
 
   // Create feature cloud.
   mDataframe->mDataframe->featureCloud = pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
   int pointCounter = 0;
   for (unsigned k = 0; k < kpts.size(); k++) {
       cv::Point3f point;
-      if (colorPixelToPoint(kpts[k].pt, point)) { // Using coordinates of distorted points to match depth 
-          float dist = sqrt(point.x*point.x + point.y*point.y + point.z*point.z);
-          if (!std::isnan(point.x)) { // 666 min and max dist? 
-              pcl::PointXYZRGBNormal pointpcl;
-              pointpcl.x = point.x;
-              pointpcl.y = point.y;
-              pointpcl.z = point.z;
-              pointpcl.r = 255;
-              pointpcl.g = 0;
-              pointpcl.b = 0;
-              mDataframe->mDataframe->featureCloud->push_back(pointpcl);
-              mDataframe->mDataframe->featureDescriptors.push_back(descriptors.row(k));
-              mDataframe->mDataframe->featureProjections.push_back(kpts[k].pt);
-          }
+      cv::Point2f p2d = kpts[k].pt;
+      
+      // Retrieve the 16-bit depth value and map it into a depth in meters
+      uint16_t depth_value = mDataframe->mDataframe->depth.at<uint16_t>(p2d.y, p2d.x);
+      float depth_in_meters = depth_value * 0.001;  // 666 depthscale plz
+      
+      // Set invalid pixels with a depth value of zero, which is used to indicate no data
+      if (depth_value == 0)
+        continue;
+      else {
+          float x = (p2d.x - intrinsics.at<float>(0,2)) / intrinsics.at<float>(0,0);
+          float y = (p2d.y - intrinsics.at<float>(1,2)) / intrinsics.at<float>(1,1);
+
+          point.x = x*depth_in_meters;
+          point.y = y*depth_in_meters;
+          point.z = depth_in_meters;
+      }
+
+      if (!std::isnan(point.x)) { // 666 min and max dist? 
+          pcl::PointXYZRGBNormal pointpcl;
+          pointpcl.x = point.x;
+          pointpcl.y = point.y;
+          pointpcl.z = point.z;
+          pointpcl.r = 255;
+          pointpcl.g = 0;
+          pointpcl.b = 0;
+          
+          mDataframe->mDataframe->featureCloud->push_back(pointpcl);
+          mDataframe->mDataframe->featureDescriptors.push_back(descriptors.row(k));
+          mDataframe->mDataframe->featureProjections.push_back(kpts[k].pt);
       }
   }
 
