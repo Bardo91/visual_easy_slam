@@ -7,17 +7,17 @@
 #ifndef NODEVISUALODOMETRY_H_
 #define NODEVISUALODOMETRY_H_
 
-#include <QtCore/QObject>
-#include <QtCore/QJsonObject>
-#include <QtWidgets/QLabel>
-
-#include <nodes/NodeDataModel>
-
 #include <rgbd_tools/map3d/Odometry.h>
 #include <rgbd_tools/map3d/OdometryRgbd.h>
 
 #include <data_types/DataframeData.hpp>
 #include <data_types/PoseData.hpp>
+
+#include <QtCore/QObject>
+#include <QtCore/QJsonObject>
+#include <QtWidgets/QLabel>
+
+#include <nodes/NodeDataModel>
 
 #include <iostream>
 
