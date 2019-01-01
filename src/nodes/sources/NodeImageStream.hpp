@@ -46,11 +46,11 @@ public:
 
 public:
 
-  QString  caption() const override { return QStringLiteral("ImageStream"); }
+  QString  caption() const override { return QStringLiteral("Image Stream"); }
 
   bool captionVisible() const override { return false; }
 
-  QString name() const override { return QStringLiteral("ImageStream"); }
+  QString name() const override { return QStringLiteral("Image Stream"); }
 
 public:
 

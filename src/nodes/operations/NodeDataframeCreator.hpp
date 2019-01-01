@@ -42,7 +42,7 @@ public:
 
   QString
   caption() const override
-  { return QStringLiteral("VisualOdometry"); }
+  { return QStringLiteral("Dataframe Creator"); }
 
   bool
   portCaptionVisible(PortType portType, PortIndex portIndex) const override
@@ -80,7 +80,7 @@ public:
 
   QString
   name() const override
-  { return QStringLiteral("dataframe_creator"); }
+  { return QStringLiteral("Dataframe Creator"); }
 
 public:
 

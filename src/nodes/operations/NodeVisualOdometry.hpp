@@ -41,7 +41,7 @@ public:
 
   QString
   caption() const override
-  { return QStringLiteral("VisualOdometry"); }
+  { return QStringLiteral("RGBDOdometry"); }
 
   bool
   portCaptionVisible(PortType portType, PortIndex portIndex) const override {
@@ -65,7 +65,7 @@ public:
   }
 
   QString  name() const override { 
-    return QStringLiteral("visual_odometry"); 
+    return QStringLiteral("RGBD Odometry"); 
   }
 
 public:

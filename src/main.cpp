@@ -14,8 +14,11 @@
 
 #include <nodes/sources/NodeImageStream.hpp>
 #include <nodes/sources/NodeStereoCamera.hpp>
+#include <nodes/sources/StringSourceData.hpp>
+
 #include <nodes/operations/NodeVisualOdometry.hpp>
 #include <nodes/operations/NodeDataframeCreator.hpp>
+
 #include <nodes/outputs/NodeImageDisplay.hpp>
 #include <nodes/outputs/NodeDisplayPoseText.hpp>
 
@@ -34,7 +37,7 @@ registerDataModels()
 
   ret->registerModel<NodeImageStream>("Sources");
   ret->registerModel<NodeStereoCamera>("Sources");
-
+  ret->registerModel<StringSourceData>("Sources");
   ret->registerModel<NodeDataframeCreator>("Sources");
 
   ret->registerModel<NodeDisplayPoseText>("Displays");

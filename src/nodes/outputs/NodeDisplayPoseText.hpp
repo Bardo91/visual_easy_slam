@@ -36,7 +36,7 @@ public:
 public:
 
   QString caption() const override { 
-    return QStringLiteral("PoseDisplay"); 
+    return QStringLiteral("Pose Display"); 
   }
 
   bool  captionVisible() const override {
@@ -44,7 +44,7 @@ public:
   }
 
   QString name() const override  { 
-    return QStringLiteral("PoseDisplay"); 
+    return QStringLiteral("Pose Display"); 
   }
 
 

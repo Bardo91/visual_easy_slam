@@ -43,16 +43,19 @@ public:
 
 public:
 
-  QString  caption() const override { return QStringLiteral("StereoCamera"); }
+  QString  caption() const override { return QStringLiteral("Stereo Camera"); }
 
   bool captionVisible() const override { return false; }
 
-  QString name() const override { return QStringLiteral("StereoCamera"); }
+  QString name() const override { return QStringLiteral("Stereo Camera"); }
 
   QString   portCaption(PortType portType, PortIndex portIndex) const override {
     switch (portType) {
       case PortType::In:
-        break;
+        if (portIndex == 0)
+            return QStringLiteral("Calibration File");
+        else
+          break;
       case PortType::Out:
         if (portIndex == 0)
           return QStringLiteral("left_image");

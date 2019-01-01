@@ -78,7 +78,7 @@ unsigned int NodeStereoCamera::nPorts(PortType portType) const {
 
   switch (portType) {
     case PortType::In:
-      result = 0;
+      result = 1;
       break;
 
     case PortType::Out:
