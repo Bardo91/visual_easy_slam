@@ -21,6 +21,7 @@
 
 #include <nodes/outputs/NodeImageDisplay.hpp>
 #include <nodes/outputs/NodeDisplayPoseText.hpp>
+#include <nodes/outputs/NodeDisplay3D.hpp>
 
 
 using QtNodes::DataModelRegistry;
@@ -42,6 +43,7 @@ registerDataModels()
 
   ret->registerModel<NodeDisplayPoseText>("Displays");
   ret->registerModel<NodeImageDisplay>("Displays");
+  ret->registerModel<NodeDisplay3D>("Displays");
 
   ret->registerModel<NodeVisualOdometry>("Odometry");
 

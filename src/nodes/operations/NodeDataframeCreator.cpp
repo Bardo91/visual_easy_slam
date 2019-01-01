@@ -31,11 +31,8 @@ QString  NodeDataframeCreator::portCaption(PortType portType, PortIndex portInde
       if (portIndex == 1)
         return QStringLiteral("depth_image");
       if (portIndex == 2)
-        return QStringLiteral("calibration");
-
-      
+        return QStringLiteral("calibration");      
       break;
-
     case PortType::Out:
       if (portIndex == 0)
         return QStringLiteral("debug_image");
@@ -95,7 +92,6 @@ std::shared_ptr<NodeData> NodeDataframeCreator::outData(PortIndex portIndex) {
 void NodeDataframeCreator::setInData(std::shared_ptr<NodeData> data, PortIndex portIndex) {
   if (portIndex == 0) {
     auto imageData = std::dynamic_pointer_cast<ImageData>(data);
-
     if (imageData)
       mInputImageRgb = imageData;
   }
@@ -116,11 +112,9 @@ void NodeDataframeCreator::setInData(std::shared_ptr<NodeData> data, PortIndex p
   }
 }
 
-
 NodeValidationState NodeDataframeCreator::validationState() const {
   return modelValidationState;
 }
-
 
 QString NodeDataframeCreator::validationMessage() const {
   return modelValidationError;
@@ -151,14 +145,14 @@ void NodeDataframeCreator::buildDataframe() {
   auto colorPixelToPoint = [&](const cv::Point2f &_p2d, cv::Point3f &_point3d){
     // Retrieve the 16-bit depth value and map it into a depth in meters
     uint16_t depth_value = mDataframe->mDataframe->depth.at<uint16_t>(_p2d.y, _p2d.x);
-    float depth_in_meters = depth_value * 1;  // 666 depthscale plz
+    float depth_in_meters = depth_value * 0.001;  // 666 depthscale plz
     // Set invalid pixels with a depth value of zero, which is used to indicate no data
     if (depth_value == 0) {
       return false;
     }
     else {
-        float x = (_p2d.x - intrinsics.at<double>(0,2)) / intrinsics.at<double>(0,0);
-        float y = (_p2d.y - intrinsics.at<double>(1,2)) / intrinsics.at<double>(1,1);
+        float x = (_p2d.x - intrinsics.at<float>(0,2)) / intrinsics.at<float>(0,0);
+        float y = (_p2d.y - intrinsics.at<float>(1,2)) / intrinsics.at<float>(1,1);
 
         _point3d.x = x*depth_in_meters;
         _point3d.y = y*depth_in_meters;
